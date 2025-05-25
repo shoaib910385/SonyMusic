@@ -171,8 +171,8 @@ queue_6 : "<b>🕚 ᴅᴜʀᴀᴛɪᴏɴ :</b> ᴜɴᴋɴᴏᴡɴ ᴅᴜʀᴀᴛ
 queue_7 : "\nᴄʟɪᴄᴋ ᴏɴ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴡʜᴏʟᴇ ǫᴜᴇᴜᴇᴅ ʟɪsᴛ."
 queue_8 : "<b>{0} ᴘʟᴀʏᴇʀ</b>\n\n🎄 <b>sᴛʀᴇᴀᴍɪɴɢ :</b> {1}\n\n🔗 <b>sᴛʀᴇᴀᴍ ᴛʏᴘᴇ :</b> {2}\n🥀 <b>ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :</b> {3}\n{4}"
 
-stream_1 : "<blockquote>▣  𝖲𝗈𝗇𝗒 𝖬𝗎𝗌𝗂𝖼 𝗦𝘁𝗮𝗿𝘁𝗲𝗱 𝗦𝘁𝗿𝗲𝗮𝗺𝗶𝗻𝗴</blockquote>\n<blockquote><b>❍ 𝐓ɩttɭ𝛆 :</b> <a href={0}>{1}</a>\n<b>✬ 𝐃ʋɽɑʈɩσŋ : {2} ᴍɪɴᴜᴛᴇs\n✭ 𝐁ɣ :** {3}</blockquote>"
-stream_2 : "<blockquote>▣  𝖲𝗈𝗇𝗒 𝖬𝗎𝗌𝗂𝖼 𝗦𝘁𝗮𝗿𝘁𝗲𝗱 𝗦𝘁𝗿𝗲𝗮𝗺𝗶𝗻𝗴</blockquote>\n<blockquote><b>➲ Sᴛᴀʀᴛᴇᴅ Sᴛʀᴇᴀᴍɪɴɢ|\n\n‣ sᴛʀᴇᴀᴍ ᴛʏᴘᴇ : ʟɪᴠᴇ sᴛʀᴇᴀᴍ [ᴜʀʟ]\n‣ ʙʏ : {0}}</blockquote>"
+stream_1 : "<blockquote>▣  𝖲𝗈𝗇𝗒 𝖬𝗎𝗌𝗂𝖼 ♪</blockquote>\n<blockquote><b>𝖳𝗂𝗍𝗅𝖾 :</b> <a href={0}>{1}</a>\n<b>𝖣𝗎𝗋𝖺𝗍𝗂𝗈𝗇 :{2} ᴍɪɴᴜᴛᴇs\n𝖡𝗒:**{3}</blockquote>"
+stream_2 : "<blockquote>▣  𝖲𝗈𝗇𝗒 𝖬𝗎𝗌𝗂𝖼 ♪</blockquote>\n<blockquote><b>➲ Sᴛᴀʀᴛᴇᴅ Sᴛʀᴇᴀᴍɪɴɢ|\n\n‣ sᴛʀᴇᴀᴍ ᴛʏᴘᴇ : ʟɪᴠᴇ sᴛʀᴇᴀᴍ [ᴜʀʟ]\n‣ ʙʏ : {0}}</blockquote>"
 
 
 CLOSE_BUTTON  : "⦿ ᴄʟᴏsᴇ ⦿"
