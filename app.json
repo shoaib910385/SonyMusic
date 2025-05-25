@@ -1,10 +1,10 @@
 {
 
-    "name": "MOON Music",
+    "name": "𝖲𝗈𝗇𝗒 𝖬𝗎𝗌𝗂𝖼",
 
     "description": "A Telegram Music Player Bot, written in Python with Pyrogram and Py-Tgcalls.",
 
-    "logo": "https://files.catbox.moe/jyeumn.jpg",
+    "logo": "https://files.catbox.moe/fgtmv9.jpg",
 
     "keywords": [
 
@@ -14,7 +14,7 @@
 
     "bot",
 
-    "MOON",
+    "𝖲𝗈𝗇𝗒",
 
     "MusicBot",
 
@@ -100,7 +100,7 @@
 
         "description": "Your heroku app name",
 
-        "value": "Amazon",
+        "value": "𝖲𝗈𝗇𝗒 𝖬𝗎𝗌𝗂𝖼",
 
         "required": false
 
