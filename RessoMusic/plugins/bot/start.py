@@ -1,4 +1,5 @@
 import time
+import random
 
 from pyrogram import filters
 from pyrogram.enums import ChatType
@@ -25,6 +26,13 @@ from config import BANNED_USERS
 from strings import get_string
 from RessoMusic.misc import SUDOERS
 
+YUMI_PICS = [
+"https://files.catbox.moe/x832ly.jpg",
+"https://files.catbox.moe/y2to84.jpg",
+"https://files.catbox.moe/qmdqx8.jpg",
+]
+
+
 
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
@@ -35,7 +43,7 @@ async def start_pm(client, message: Message, _):
         if name[0:4] == "help":
             keyboard = help_pannel(_)
             return await message.reply_photo(
-                photo=config.START_IMG_URL,
+                random.choice(YUMI_PICS),
                 caption=_["help_1"].format(config.SUPPORT_GROUP),
                 protect_content=True,
                 reply_markup=keyboard,
