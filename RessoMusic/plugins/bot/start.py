@@ -32,11 +32,35 @@ YUMI_PICS = [
 "https://files.catbox.moe/qmdqx8.jpg",
 ]
 
+GREET = [
+    "💞", "🥂", "🔍", "🧪", "🥂", "⚡️", "🔥",
+]
 
 
 @app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS)
 @LanguageStart
 async def start_pm(client, message: Message, _):
+
+    loading_1 = await message.reply_text(random.choice(GREET))
+    await add_served_user(message.from_user.id)
+    
+    await asyncio.sleep(0.1)
+    await loading_1.edit_text("<b>ᴅɪηɢ ᴅᴏηɢ.❤️‍🔥</b>")
+    await asyncio.sleep(0.1)
+    await loading_1.edit_text("<b>ᴅɪηɢ ᴅᴏηɢ..❤️‍🔥</b>")
+    await asyncio.sleep(0.1)
+    await loading_1.edit_text("<b>ᴅɪηɢ ᴅᴏηɢ...❤️‍🔥</b>")
+    await asyncio.sleep(0.1)
+    await loading_1.edit_text("<b>ᴅɪηɢ ᴅᴏηɢ....❤️‍🔥</b>")
+    await asyncio.sleep(0.1)
+    await loading_1.edit_text("<b>ᴅɪηɢ ᴅᴏηɢ.....❤️‍🔥</b>")
+    await asyncio.sleep(0.1)
+    await loading_1.edit_text("<b>ᴅɪηɢ ᴅᴏηɢ......❤️‍🔥</b>")
+    await asyncio.sleep(0.1)
+    await loading_1.delete()
+
+
+    
     await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
@@ -220,4 +244,5 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
+
 
