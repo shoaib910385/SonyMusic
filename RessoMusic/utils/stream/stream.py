@@ -31,20 +31,11 @@ async def stream(
 ):
     if not result:
         return
-
-    # Stop current stream if forceplay used
     if forceplay:
-        try:
-            await AMBOTOP.force_stop_stream(chat_id)
-        except Exception:
-            # don't crash if force_stop fails
-            pass
-
-    # -------- PLAYLIST ----------
+        await AMBOTOP.force_stop_stream(chat_id)
     if streamtype == "playlist":
         msg = f"{_['play_19']}\n\n"
         count = 0
-        position = 0
         for search in result:
             if int(count) == config.PLAYLIST_FETCH_LIMIT:
                 continue
@@ -56,15 +47,12 @@ async def stream(
                     thumbnail,
                     vidid,
                 ) = await YouTube.details(search, False if spotify else True)
-            except Exception:
+            except:
                 continue
-
             if str(duration_min) == "None":
                 continue
             if duration_sec > config.DURATION_LIMIT:
                 continue
-
-            # If already active, just queue
             if await is_active_chat(chat_id):
                 await put_queue(
                     chat_id,
@@ -82,28 +70,22 @@ async def stream(
                 msg += f"{count}. {title[:70]}\n"
                 msg += f"{_['play_20']} {position}\n\n"
             else:
-                # start streaming the first track
                 if not forceplay:
                     db[chat_id] = []
                 status = True if video else None
                 try:
                     file_path, direct = await YouTube.download(
-                        vidid, mystic, videoid=True, video=status
+                        vidid, mystic, video=status, videoid=True
                     )
-                except Exception:
+                except:
                     raise AssistantErr(_["play_14"])
-                try:
-                    await AMBOTOP.join_call(
-                        chat_id,
-                        original_chat_id,
-                        file_path,
-                        video=status,
-                        image=thumbnail,
-                    )
-                except Exception as e:
-                    # if join_call fails, propagate as AssistantErr
-                    raise AssistantErr(_["general_2"].format(type(e).__name__))
-
+                await AMBOTOP.join_call(
+                    chat_id,
+                    original_chat_id,
+                    file_path,
+                    video=status,
+                    image=thumbnail,
+                )
                 await put_queue(
                     chat_id,
                     original_chat_id,
@@ -116,92 +98,58 @@ async def stream(
                     "video" if video else "audio",
                     forceplay=forceplay,
                 )
-
-                # generate thumbnail (safe)
-                try:
-                    img = await gen_thumb(vidid)
-                except Exception:
-                    img = thumbnail if thumbnail else config.STREAM_IMG_URL
-
+                img = await gen_thumb(vidid)
                 button = stream_markup(_, chat_id)
-                try:
-                    run = await app.send_photo(
-                        original_chat_id,
-                        photo=img,
-                        has_spoiler=True,
-                        caption=_["stream_1"].format(
-                            f"https://t.me/{app.username}?start=info_{vidid}",
-                            title[:23],
-                            duration_min,
-                            user_name,
-                        ),
-                        reply_markup=InlineKeyboardMarkup(button),
-                    )
-                    db[chat_id][0]["mystic"] = run
-                    db[chat_id][0]["markup"] = "stream"
-                except Exception:
-                    # continue even if sending photo fails
-                    pass
-
+                run = await app.send_photo(
+                    original_chat_id,
+                    photo=img,
+                    has_spoiler=True,
+                    caption=_["stream_1"].format(
+                        f"https://t.me/{app.username}?start=info_{vidid}",
+                        title[:23],
+                        duration_min,
+                        user_name,
+                    ),
+                    reply_markup=InlineKeyboardMarkup(button),
+                )
+                db[chat_id][0]["mystic"] = run
+                db[chat_id][0]["markup"] = "stream"
         if count == 0:
             return
         else:
-            # try to upload playlist text to pastebin and generate carbon, but don't fail if it errors
-            try:
-                link = await AMBOTOPBin(msg)
-            except Exception:
-                link = "N/A"
+            link = await AMBOTOPBin(msg)
             lines = msg.count("\n")
             if lines >= 17:
                 car = os.linesep.join(msg.split(os.linesep)[:17])
             else:
                 car = msg
-            try:
-                carbon = await Carbon.generate(car, randint(100, 10000000))
-            except Exception:
-                carbon = None
-
+            carbon = await Carbon.generate(car, randint(100, 10000000))
             upl = close_markup(_)
-            try:
-                if carbon:
-                    return await app.send_photo(
-                        original_chat_id,
-                        photo=carbon,
-                        caption=_["play_21"].format(position, link),
-                        reply_markup=upl,
-                    )
-                else:
-                    return await app.send_message(
-                        original_chat_id,
-                        text=_["play_21"].format(position, link),
-                        reply_markup=upl,
-                    )
-            except Exception:
-                return
-
-    # -------- YOUTUBE (single track) ----------
+            return await app.send_photo(
+                original_chat_id,
+                photo=carbon,
+                caption=_["play_21"].format(position, link),
+                reply_markup=upl,
+            )
     elif streamtype == "youtube":
-        link = result.get("link")
-        vidid = result.get("vidid")
-        title = (result.get("title") or "").title()
-        duration_min = result.get("duration_min")
-        thumbnail = result.get("thumb")
+        link = result["link"]
+        vidid = result["vidid"]
+        title = (result["title"]).title()
+        duration_min = result["duration_min"]
+        thumbnail = result["thumb"]
         status = True if video else None
-
-        # enforce queue size limit if desired
+    
         current_queue = db.get(chat_id)
+
+        
         if current_queue is not None and len(current_queue) >= 10:
-            try:
-                await app.send_message(original_chat_id, "You can't add more than 10 songs to the queue.")
-            except Exception:
-                pass
-            return
+            return await app.send_message(original_chat_id, "You can't add more than 10 songs to the queue.")
 
         try:
             file_path, direct = await YouTube.download(
                 vidid, mystic, videoid=True, video=status
             )
-        except Exception:
+        except:
             raise AssistantErr(_["play_14"])
 
         if await is_active_chat(chat_id):
@@ -218,28 +166,21 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            try:
-                await app.send_message(
-                    chat_id=original_chat_id,
-                    text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-            except Exception:
-                pass
+            await app.send_message(
+                chat_id=original_chat_id,
+                text=_["queue_4"].format(position, title[:27], duration_min, user_name),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
         else:
             if not forceplay:
                 db[chat_id] = []
-            try:
-                await AMBOTOP.join_call(
-                    chat_id,
-                    original_chat_id,
-                    file_path,
-                    video=status,
-                    image=thumbnail,
-                )
-            except Exception as e:
-                raise AssistantErr(_["general_2"].format(type(e).__name__))
-
+            await AMBOTOP.join_call(
+                chat_id,
+                original_chat_id,
+                file_path,
+                video=status,
+                image=thumbnail,
+            )
             await put_queue(
                 chat_id,
                 original_chat_id,
@@ -252,37 +193,25 @@ async def stream(
                 "video" if video else "audio",
                 forceplay=forceplay,
             )
-
-            # thumbnail generation fallback
-            try:
-                img = await gen_thumb(vidid)
-            except Exception:
-                img = thumbnail if thumbnail else config.STREAM_IMG_URL
-
+            img = await gen_thumb(vidid)
             button = stream_markup(_, chat_id)
-            try:
-                run = await app.send_photo(
-                    original_chat_id,
-                    photo=img,
-                    caption=_["stream_1"].format(
-                        f"https://t.me/{app.username}?start=info_{vidid}",
-                        title[:23],
-                        duration_min,
-                        user_name,
-                    ),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-                db[chat_id][0]["mystic"] = run
-                db[chat_id][0]["markup"] = "stream"
-            except Exception:
-                # continue even if sending fails
-                pass
-
-    # -------- SOUNDCLOUD ----------
+            run = await app.send_photo(
+                original_chat_id,
+                photo=img,
+                caption=_["stream_1"].format(
+                    f"https://t.me/{app.username}?start=info_{vidid}",
+                    title[:23],
+                    duration_min,
+                    user_name,
+                ),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "stream"
     elif streamtype == "soundcloud":
-        file_path = result.get("filepath")
-        title = result.get("title")
-        duration_min = result.get("duration_min")
+        file_path = result["filepath"]
+        title = result["title"]
+        duration_min = result["duration_min"]
         if await is_active_chat(chat_id):
             await put_queue(
                 chat_id,
@@ -297,22 +226,15 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            try:
-                await app.send_message(
-                    chat_id=original_chat_id,
-                    text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-            except Exception:
-                pass
+            await app.send_message(
+                chat_id=original_chat_id,
+                text=_["queue_4"].format(position, title[:27], duration_min, user_name),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
         else:
             if not forceplay:
                 db[chat_id] = []
-            try:
-                await AMBOTOP.join_call(chat_id, original_chat_id, file_path, video=None)
-            except Exception as e:
-                raise AssistantErr(_["general_2"].format(type(e).__name__))
-
+            await AMBOTOP.join_call(chat_id, original_chat_id, file_path, video=None)
             await put_queue(
                 chat_id,
                 original_chat_id,
@@ -326,28 +248,22 @@ async def stream(
                 forceplay=forceplay,
             )
             button = stream_markup(_, chat_id)
-            try:
-                run = await app.send_photo(
-                    original_chat_id,
-                    photo=config.SOUNCLOUD_IMG_URL,
-                    caption=_["stream_1"].format(
-                        config.SUPPORT_GROUP, title[:23], duration_min, user_name
-                    ),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-                db[chat_id][0]["mystic"] = run
-                db[chat_id][0]["markup"] = "tg"
-            except Exception:
-                pass
-
-    # -------- TELEGRAM (uploaded file) ----------
+            run = await app.send_photo(
+                original_chat_id,
+                photo=config.SOUNCLOUD_IMG_URL,
+                caption=_["stream_1"].format(
+                    config.SUPPORT_GROUP, title[:23], duration_min, user_name
+                ),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "tg"
     elif streamtype == "telegram":
-        file_path = result.get("path")
-        link = result.get("link")
-        title = (result.get("title") or "").title()
-        duration_min = result.get("dur")
+        file_path = result["path"]
+        link = result["link"]
+        title = (result["title"]).title()
+        duration_min = result["dur"]
         status = True if video else None
-
         if await is_active_chat(chat_id):
             await put_queue(
                 chat_id,
@@ -362,22 +278,15 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            try:
-                await app.send_message(
-                    chat_id=original_chat_id,
-                    text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-            except Exception:
-                pass
+            await app.send_message(
+                chat_id=original_chat_id,
+                text=_["queue_4"].format(position, title[:27], duration_min, user_name),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
         else:
             if not forceplay:
                 db[chat_id] = []
-            try:
-                await AMBOTOP.join_call(chat_id, original_chat_id, file_path, video=status)
-            except Exception as e:
-                raise AssistantErr(_["general_2"].format(type(e).__name__))
-
+            await AMBOTOP.join_call(chat_id, original_chat_id, file_path, video=status)
             await put_queue(
                 chat_id,
                 original_chat_id,
@@ -391,32 +300,23 @@ async def stream(
                 forceplay=forceplay,
             )
             if video:
-                try:
-                    await add_active_video_chat(chat_id)
-                except Exception:
-                    pass
+                await add_active_video_chat(chat_id)
             button = stream_markup(_, chat_id)
-            try:
-                run = await app.send_photo(
-                    original_chat_id,
-                    photo=config.TELEGRAM_VIDEO_URL if video else config.TELEGRAM_AUDIO_URL,
-                    caption=_["stream_1"].format(link, title[:23], duration_min, user_name),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-                db[chat_id][0]["mystic"] = run
-                db[chat_id][0]["markup"] = "tg"
-            except Exception:
-                pass
-
-    # -------- LIVE ----------
+            run = await app.send_photo(
+                original_chat_id,
+                photo=config.TELEGRAM_VIDEO_URL if video else config.TELEGRAM_AUDIO_URL,
+                caption=_["stream_1"].format(link, title[:23], duration_min, user_name),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "tg"
     elif streamtype == "live":
-        link = result.get("link")
-        vidid = result.get("vidid")
-        title = (result.get("title") or "").title()
-        thumbnail = result.get("thumb")
+        link = result["link"]
+        vidid = result["vidid"]
+        title = (result["title"]).title()
+        thumbnail = result["thumb"]
         duration_min = "Live Track"
         status = True if video else None
-
         if await is_active_chat(chat_id):
             await put_queue(
                 chat_id,
@@ -431,31 +331,24 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            try:
-                await app.send_message(
-                    chat_id=original_chat_id,
-                    text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-            except Exception:
-                pass
+            await app.send_message(
+                chat_id=original_chat_id,
+                text=_["queue_4"].format(position, title[:27], duration_min, user_name),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
         else:
             if not forceplay:
                 db[chat_id] = []
             n, file_path = await YouTube.video(link)
             if n == 0:
                 raise AssistantErr(_["str_3"])
-            try:
-                await AMBOTOP.join_call(
-                    chat_id,
-                    original_chat_id,
-                    file_path,
-                    video=status,
-                    image=thumbnail if thumbnail else None,
-                )
-            except Exception as e:
-                raise AssistantErr(_["general_2"].format(type(e).__name__))
-
+            await AMBOTOP.join_call(
+                chat_id,
+                original_chat_id,
+                file_path,
+                video=status,
+                image=thumbnail if thumbnail else None,
+            )
             await put_queue(
                 chat_id,
                 original_chat_id,
@@ -468,32 +361,21 @@ async def stream(
                 "video" if video else "audio",
                 forceplay=forceplay,
             )
-
-            try:
-                img = await gen_thumb(vidid)
-            except Exception:
-                img = thumbnail if thumbnail else config.STREAM_IMG_URL
-
+            img = await gen_thumb(vidid)
             button = stream_markup(_, chat_id)
-            try:
-                run = await app.send_photo(
-                    original_chat_id,
-                    photo=img,
-                    has_spoiler=True,
-                    caption=_["stream_1"].format(
-                        f"https://t.me/{app.username}?start=info_{vidid}",
-                        title[:23],
-                        duration_min,
-                        user_name,
-                    ),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-                db[chat_id][0]["mystic"] = run
-                db[chat_id][0]["markup"] = "tg"
-            except Exception:
-                pass
-
-    # -------- INDEX / M3U8 ----------
+            run = await app.send_photo(
+                original_chat_id,
+                photo=img,
+                caption=_["stream_1"].format(
+                    f"https://t.me/{app.username}?start=info_{vidid}",
+                    title[:23],
+                    duration_min,
+                    user_name,
+                ),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "tg"
     elif streamtype == "index":
         link = result
         title = "ɪɴᴅᴇx ᴏʀ ᴍ3ᴜ8 ʟɪɴᴋ"
@@ -511,27 +393,19 @@ async def stream(
             )
             position = len(db.get(chat_id)) - 1
             button = aq_markup(_, chat_id)
-            try:
-                await mystic.edit_text(
-                    text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-            except Exception:
-                # ignore edit failures
-                pass
+            await mystic.edit_text(
+                text=_["queue_4"].format(position, title[:27], duration_min, user_name),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
         else:
             if not forceplay:
                 db[chat_id] = []
-            try:
-                await AMBOTOP.join_call(
-                    chat_id,
-                    original_chat_id,
-                    link,
-                    video=True if video else None,
-                )
-            except Exception as e:
-                raise AssistantErr(_["general_2"].format(type(e).__name__))
-
+            await AMBOTOP.join_call(
+                chat_id,
+                original_chat_id,
+                link,
+                video=True if video else None,
+            )
             await put_queue_index(
                 chat_id,
                 original_chat_id,
@@ -544,19 +418,16 @@ async def stream(
                 forceplay=forceplay,
             )
             button = stream_markup(_, chat_id)
-            try:
-                run = await app.send_photo(
-                    original_chat_id,
-                    photo=config.STREAM_IMG_URL,
-                    has_spoiler=True,
-                    caption=_["stream_2"].format(user_name),
-                    reply_markup=InlineKeyboardMarkup(button),
-                )
-                db[chat_id][0]["mystic"] = run
-                db[chat_id][0]["markup"] = "tg"
-            except Exception:
-                pass
-            try:
-                await mystic.delete()
-            except Exception:
-                pass
+            run = await app.send_photo(
+                original_chat_id,
+                photo=config.STREAM_IMG_URL,
+                has_spoiler=True,
+                caption=_["stream_2"].format(user_name),
+                reply_markup=InlineKeyboardMarkup(button),
+            )
+            db[chat_id][0]["mystic"] = run
+            db[chat_id][0]["markup"] = "tg"
+            await mystic.delete()
+
+
+
