@@ -171,7 +171,7 @@ queue_6 : "<b>🕚 ᴅᴜʀᴀᴛɪᴏɴ :</b> ᴜɴᴋɴᴏᴡɴ ᴅᴜʀᴀᴛ
 queue_7 : "\nᴄʟɪᴄᴋ ᴏɴ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴡʜᴏʟᴇ ǫᴜᴇᴜᴇᴅ ʟɪsᴛ."
 queue_8 : "<b>{0} ᴘʟᴀʏᴇʀ</b>\n\n🎄 <b>sᴛʀᴇᴀᴍɪɴɢ :</b> {1}\n\n🔗 <b>sᴛʀᴇᴀᴍ ᴛʏᴘᴇ :</b> {2}\n🥀 <b>ʀᴇǫᴜᴇsᴛᴇᴅ ʙʏ :</b> {3}\n{4}"
 
-stream_1 : "<pre>▣ Sᴛᴀʀᴛᴇᴅ Sᴛʀᴇᴀᴍɪɴɢ♪</pre>\n<blockquote>๏ Tɪᴛʟᴇ: <a href={0}>{1}</a>\n<b>๏ Dᴜʀᴀᴛɪᴏɴ:{2} ᴍɪɴᴜᴛᴇs\n๏ Rᴇǫᴜᴇsᴛᴇᴅ:**{3}</blockquote>\n<blockquote>❖ ᴘᴏᴡєʀєᴅ» <a href=https://t.me/itzdhruv>𝗠𝙧ᎠҺ𝙧𝙪𝘃♡</a></blockquote>"
+stream_1 : "<pre>▣ Sᴛᴀʀᴛᴇᴅ Sᴛʀᴇᴀᴍɪɴɢ♪</pre>\n<blockquote><b>๏ Tɪᴛʟᴇ:</b> <a href={0}>{1}</a>\n<b>๏ Dᴜʀᴀᴛɪᴏɴ:</b> {2} ᴍɪɴᴜᴛᴇs\n<b>๏ Rᴇǫᴜᴇsᴛᴇᴅ:</b> {3}</blockquote>\n<blockquote>❖ ᴘᴏᴡєʀєᴅ» <a href=https://t.me/itzdhruv>𝗠𝙧ᎠҺ𝙧𝙪𝘃♡</a></blockquote>"
 stream_2 : "<blockquote>▣ Sᴛᴀʀᴛᴇᴅ Sᴛʀᴇᴀᴍɪɴɢ♪</blockquote>\n<blockquote><b>➲ Sᴛᴀʀᴛᴇᴅ Sᴛʀᴇᴀᴍɪɴɢ|\n\n‣ sᴛʀᴇᴀᴍ ᴛʏᴘᴇ : ʟɪᴠᴇ sᴛʀᴇᴀᴍ [ᴜʀʟ]\n‣ ʙʏ : {0}}</blockquote>"
 
 
@@ -327,6 +327,7 @@ song_11 : "ᴜᴘʟᴏᴀᴅɪɴɢ sᴛᴀʀᴛᴇᴅ ʙᴀʙʏ\n\nᴘʟᴇᴀs�
 SG_B_1 : "• ᴄʟɪᴄᴋ ʜᴇʀᴇ •"
 SG_B_2 : "🎧 ᴀᴜᴅɪᴏ 🎧"
 SG_B_3 : "🎥 ᴠɪᴅᴇᴏ 🎥"
+
 
 
 
