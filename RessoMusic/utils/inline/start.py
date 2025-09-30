@@ -25,13 +25,14 @@ def private_panel(_):
             )
         ],
         [InlineKeyboardButton("˹ʜєʟᴘ˼", callback_data="settings_back_helper"),
-        InlineKeyboardButton("˹ᴄʜᴧɴɴєʟ˼", url=config.SUPPORT_GROUP),
+        InlineKeyboardButton("˹ᴄʜᴧɴɴєʟ˼", url="https://t.me/itzdhruv1060"),
             #InlineKeyboardButton(text=_["S_B_7"], url=config.UPSTREAM_REPO),
         ],
-        [InlineKeyboardButton("˹ ϻʏ ϻᴧsᴛᴇєʀ ˼ 👑", url=f"https://t.me/itzdhruv")
+        [InlineKeyboardButton("˹ ϻʏ ϻᴧsᴛєʀ ˼ 👑", url=f"https://t.me/itzdhruv")
 
         ],
         
     ]
     return buttons
+
 
