@@ -44,6 +44,7 @@ async def start_pm(client, message: Message, _):
             keyboard = help_pannel(_)
             return await message.reply_photo(
                 random.choice(YUMI_PICS),
+                has_spoiler=True
                 caption=_["help_1"].format(config.SUPPORT_GROUP),
                 protect_content=True,
                 reply_markup=keyboard,
@@ -206,6 +207,7 @@ async def welcome(client, message: Message):
                 out = start_panel(_)
                 await message.reply_photo(
                     random.choice(YUMI_PICS),
+                    has_spoiler=True
                     caption=_["start_3"].format(
                         message.from_user.first_name,
                         app.mention,
@@ -218,3 +220,4 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
+
