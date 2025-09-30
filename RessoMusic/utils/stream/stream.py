@@ -75,7 +75,7 @@ async def stream(
                 status = True if video else None
                 try:
                     file_path, direct = await YouTube.download(
-                        vidid, mystic, video=status, videoid=True
+                        vidid, mystic, videoid=True, video=status
                     )
                 except:
                     raise AssistantErr(_["play_14"])
@@ -428,6 +428,7 @@ async def stream(
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
             await mystic.delete()
+
 
 
 
