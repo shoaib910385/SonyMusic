@@ -1,5 +1,6 @@
 import time
 import random
+import asyncio
 
 from pyrogram import filters
 from pyrogram.enums import ChatType
@@ -244,6 +245,7 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
+
 
 
 
