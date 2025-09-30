@@ -1,11 +1,15 @@
-import asyncio, os, re, httpx, aiofiles.os
-from io import BytesIO 
+import asyncio, os, re, httpx
+from io import BytesIO
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 from aiofiles.os import path as aiopath
-from youtubesearchpython.__future__ import VideosSearch
 
 from ..logging import LOGGER
+from youtubesearchpython.__future__ import VideosSearch
 
+
+# ========================
+# Font Loader
+# ========================
 def load_fonts():
     try:
         return {
@@ -19,13 +23,16 @@ def load_fonts():
             "tfont": ImageFont.load_default(),
         }
 
+
 FONTS = load_fonts()
 
-
 FALLBACK_IMAGE_PATH = "RessoMusic/assets/controller.png"
-
 YOUTUBE_IMG_URL = "https://i.ytimg.com/vi/default.jpg"
 
+
+# ========================
+# Utilities
+# ========================
 async def resize_youtube_thumbnail(img: Image.Image) -> Image.Image:
     target_width, target_height = 1280, 720
     aspect_ratio = img.width / img.height
@@ -44,10 +51,11 @@ async def resize_youtube_thumbnail(img: Image.Image) -> Image.Image:
     right = left + target_width
     bottom = top + target_height
 
-    img = img.crop((left, top, right, bottom))
-    enhanced = ImageEnhance.Sharpness(img).enhance(1.5)
+    cropped = img.crop((left, top, right, bottom))
+    enhanced = ImageEnhance.Sharpness(cropped).enhance(1.5)
     img.close()
     return enhanced
+
 
 async def fetch_image(url: str) -> Image.Image:
     async with httpx.AsyncClient() as client:
@@ -59,12 +67,10 @@ async def fetch_image(url: str) -> Image.Image:
             img = Image.open(BytesIO(response.content)).convert("RGBA")
             if url.startswith("https://i.ytimg.com"):
                 img = await resize_youtube_thumbnail(img)
-            else:
-                img.close()
-                img = Image.new("RGBA", (1280, 720), (255, 255, 255, 255))
             return img
         except Exception as e:
             LOGGER.error("Image loading error for URL %s: %s", url, e)
+            # Try fallback YouTube default
             try:
                 response = await client.get(YOUTUBE_IMG_URL, timeout=5)
                 response.raise_for_status()
@@ -73,14 +79,16 @@ async def fetch_image(url: str) -> Image.Image:
                 return img
             except Exception as e:
                 LOGGER.error("YouTube fallback image error: %s", e)
+                # Try local fallback
                 try:
-                    async with aiofiles.open(FALLBACK_IMAGE_PATH, mode="rb") as f:
-                        img = Image.open(BytesIO(await f.read())).convert("RGBA")
+                    with open(FALLBACK_IMAGE_PATH, "rb") as f:
+                        img = Image.open(BytesIO(f.read())).convert("RGBA")
                     img = await resize_youtube_thumbnail(img)
                     return img
                 except Exception as e:
                     LOGGER.error("Local fallback image error: %s", e)
                     return Image.new("RGBA", (1280, 720), (255, 255, 255, 255))
+
 
 def clean_text(text: str, limit: int = 25) -> str:
     if not text:
@@ -88,23 +96,20 @@ def clean_text(text: str, limit: int = 25) -> str:
     text = text.strip()
     return f"{text[:limit - 3]}..." if len(text) > limit else text
 
+
 async def add_controls(img: Image.Image) -> Image.Image:
     img = img.filter(ImageFilter.GaussianBlur(radius=10))
     box = (305, 125, 975, 595)
     region = img.crop(box)
     try:
         controls = Image.open("RessoMusic/assets/controls.png").convert("RGBA")
-        controls = controls.resize((1200, 320), Image.Resampling.LANCZOS)
-        controls = ImageEnhance.Sharpness(controls).enhance(5.0)
-        controls = ImageEnhance.Contrast(controls).enhance(1.0)
         controls = controls.resize((600, 160), Image.Resampling.LANCZOS)
-        controls_x = 305 + (670 - 600) // 2 
-        controls_y = 415  
+        controls = ImageEnhance.Sharpness(controls).enhance(5.0)
+        controls_x, controls_y = 335, 415
     except Exception as e:
         LOGGER.error("Controls image loading error: %s", e)
         controls = Image.new("RGBA", (600, 160), (0, 0, 0, 0))
         controls_x, controls_y = 335, 415
-
 
     dark_region = ImageEnhance.Brightness(region).enhance(0.5)
     mask = Image.new("L", dark_region.size, 0)
@@ -114,10 +119,11 @@ async def add_controls(img: Image.Image) -> Image.Image:
 
     img.paste(dark_region, box, mask)
     img.paste(controls, (controls_x, controls_y), controls)
-    
+
     region.close()
     controls.close()
     return img
+
 
 def make_rounded_rectangle(image: Image.Image, size: tuple = (184, 184)) -> Image.Image:
     width, height = image.size
@@ -140,6 +146,10 @@ def make_rounded_rectangle(image: Image.Image, size: tuple = (184, 184)) -> Imag
     resize.close()
     return rounded
 
+
+# ========================
+# Main Function
+# ========================
 async def get_thumb(videoid: str) -> str:
     if not videoid or not re.match(r"^[a-zA-Z0-9_-]{11}$", videoid):
         LOGGER.error("Invalid YouTube video ID: %s", videoid)
@@ -171,18 +181,18 @@ async def get_thumb(videoid: str) -> str:
     bg = await add_controls(thumb)
     image = make_rounded_rectangle(thumb, size=(184, 184))
 
-    paste_x, paste_y = 325, 155 
+    # Paste rounded thumbnail
+    paste_x, paste_y = 325, 155
     bg.paste(image, (paste_x, paste_y), image)
 
-    
+    # Draw text
     draw = ImageDraw.Draw(bg)
-    draw.text((540, 155), title, (255, 255, 255), font=FONTS["tfont"])  
-    draw.text((540, 200), artist, (255, 255, 255), font=FONTS["cfont"]) 
+    draw.text((540, 155), title, (255, 255, 255), font=FONTS["tfont"])
+    draw.text((540, 200), artist, (255, 255, 255), font=FONTS["cfont"])
 
-
+    # Enhance
     bg = ImageEnhance.Contrast(bg).enhance(1.1)
     bg = ImageEnhance.Color(bg).enhance(1.2)
-
 
     try:
         await asyncio.to_thread(bg.save, save_dir, format="PNG", quality=95, optimize=True)
@@ -199,3 +209,10 @@ async def get_thumb(videoid: str) -> str:
     image.close()
     bg.close()
     return ""
+
+
+# ========================
+# Backward Compatibility
+# ========================
+# Old code expects gen_thumb, so map it here
+gen_thumb = get_thumb
