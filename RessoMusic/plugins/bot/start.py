@@ -231,7 +231,7 @@ async def welcome(client, message: Message):
                 out = start_panel(_)
                 await message.reply_photo(
                     random.choice(YUMI_PICS),
-                    has_spoiler=True
+                    has_spoiler=True,
                     caption=_["start_3"].format(
                         message.from_user.first_name,
                         app.mention,
@@ -244,6 +244,7 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
+
 
 
 
