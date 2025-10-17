@@ -2,6 +2,19 @@ import uvloop
 
 uvloop.install()
 
+import asyncio
+
+# Ensure there's an event loop set for the main thread (fixes
+# RuntimeError: There is no current event loop in thread 'MainThread')
+try:
+    # Python 3.7+: get_running_loop raises if no loop is running
+    asyncio.get_running_loop()
+except RuntimeError:
+    # No running loop — create and set one for this thread
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
+from RessoMusic.core.bot import AMBOTOP
+
 from pyrogram import Client, errors
 from pyrogram.enums import ChatMemberStatus, ParseMode
 
@@ -55,3 +68,4 @@ class AMBOTOP(Client):
 
     async def stop(self):
         await super().stop()
+
