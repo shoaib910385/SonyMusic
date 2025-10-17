@@ -1,4 +1,4 @@
-from RessoMusic.core.bot import SHUKLA
+from RessoMusic.core.bot import AMBOTOP
 from RessoMusic.core.dir import dirr
 from RessoMusic.core.git import git
 from RessoMusic.core.userbot import Userbot
@@ -28,3 +28,4 @@ Telegram = TeleAPI()
 YouTube = YouTubeAPI()
 
 APP = "TIDALXMUSICBOT"  # connect music api key "Dont change it"
+
