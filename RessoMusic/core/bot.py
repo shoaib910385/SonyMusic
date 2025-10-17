@@ -1,12 +1,4 @@
-import asyncio
 import uvloop
-
-# ✅ Ensure a running event loop before installing uvloop
-try:
-    asyncio.get_running_loop()
-except RuntimeError:
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
 
 uvloop.install()
 
@@ -19,7 +11,7 @@ from ..logging import LOGGER
 
 class AMBOTOP(Client):
     def __init__(self):
-        LOGGER(__name__).info("Starting Bot...")
+        LOGGER(__name__).info(f"Starting Bot...")
         super().__init__(
             name="RessoMusic",
             api_id=config.API_ID,
