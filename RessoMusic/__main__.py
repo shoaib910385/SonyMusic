@@ -1,6 +1,9 @@
 import asyncio
 import importlib
 
+# ✅ Fix: ensure event loop exists and set compatible policy
+asyncio.set_event_loop_policy(asyncio.DefaultEventLoopPolicy())
+
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
 
@@ -23,7 +26,9 @@ async def init():
     ):
         LOGGER(__name__).error("Assistant client variables not defined, exiting...")
         exit()
+
     await sudo()
+
     try:
         users = await get_gbanned()
         for user_id in users:
@@ -33,30 +38,36 @@ async def init():
             BANNED_USERS.add(user_id)
     except:
         pass
+
     await app.start()
+
     for all_module in ALL_MODULES:
         importlib.import_module("RessoMusic.plugins" + all_module)
+
     LOGGER("RessoMusic.plugins").info("Successfully Imported Modules...")
+
     await userbot.start()
     await AMBOTOP.start()
+
     try:
         await AMBOTOP.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
     except NoActiveGroupCall:
         LOGGER("RessoMusic").error(
-            "Please turn on the videochat of your log group\channel.\n\nStopping Bot..."
+            "Please turn on the videochat of your log group/channel.\n\nStopping Bot..."
         )
         exit()
     except:
         pass
+
     await AMBOTOP.decorators()
-    LOGGER("RessoMusic").info(
-        "moon music started"
-    )
+    LOGGER("RessoMusic").info("Moon music started ✅")
+
     await idle()
+
     await app.stop()
     await userbot.stop()
     LOGGER("RessoMusic").info("Stopping AMBOTOP Music Bot...")
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(init())
+    asyncio.run(init())
