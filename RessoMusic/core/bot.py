@@ -1,4 +1,11 @@
+import asyncio
 import uvloop
+
+# ✅ Ensure event loop exists before installing uvloop
+try:
+    asyncio.get_event_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
 
 uvloop.install()
 
@@ -11,7 +18,7 @@ from ..logging import LOGGER
 
 class AMBOTOP(Client):
     def __init__(self):
-        LOGGER(__name__).info(f"Starting Bot...")
+        LOGGER(__name__).info("Starting Bot...")
         super().__init__(
             name="RessoMusic",
             api_id=config.API_ID,
@@ -32,16 +39,22 @@ class AMBOTOP(Client):
         try:
             await self.send_message(
                 chat_id=config.LOG_GROUP_ID,
-                text=f"<u><b>» {self.mention} ʙᴏᴛ sᴛᴀʀᴛᴇᴅ :</b><u>\n\nɪᴅ : <code>{self.id}</code>\nɴᴀᴍᴇ : {self.name}\nᴜsᴇʀɴᴀᴍᴇ : @{self.username}",
+                text=(
+                    f"<u><b>» {self.mention} ʙᴏᴛ sᴛᴀʀᴛᴇᴅ :</b></u>\n\n"
+                    f"ɪᴅ : <code>{self.id}</code>\n"
+                    f"ɴᴀᴍᴇ : {self.name}\n"
+                    f"ᴜsᴇʀɴᴀᴍᴇ : @{self.username}"
+                ),
             )
         except (errors.ChannelInvalid, errors.PeerIdInvalid):
             LOGGER(__name__).error(
-                "Bot has failed to access the log group/channel. Make sure that you have added your bot to your log group/channel."
+                "Bot has failed to access the log group/channel. "
+                "Make sure that you have added your bot to your log group/channel."
             )
             exit()
         except Exception as ex:
             LOGGER(__name__).error(
-                f"Bot has failed to access the log group/channel.\n  Reason : {type(ex).__name__}."
+                f"Bot has failed to access the log group/channel.\nReason: {type(ex).__name__}."
             )
             exit()
 
@@ -51,6 +64,7 @@ class AMBOTOP(Client):
                 "Please promote your bot as an admin in your log group/channel."
             )
             exit()
+
         LOGGER(__name__).info(f"Music Bot Started as {self.name}")
 
     async def stop(self):
