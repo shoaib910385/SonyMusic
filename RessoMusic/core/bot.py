@@ -1,24 +1,8 @@
-import uvloop
-
-uvloop.install()
-
-import asyncio
-
-# Ensure there's an event loop set for the main thread (fixes
-# RuntimeError: There is no current event loop in thread 'MainThread')
-try:
-    # Python 3.7+: get_running_loop raises if no loop is running
-    asyncio.get_running_loop()
-except RuntimeError:
-    # No running loop — create and set one for this thread
-    asyncio.set_event_loop(asyncio.new_event_loop())
-
-from RessoMusic.core.bot import AMBOTOP
-
 from pyrogram import Client, errors
 from pyrogram.enums import ChatMemberStatus, ParseMode
 
 import config
+
 from ..logging import LOGGER
 
 
@@ -31,7 +15,6 @@ class AMBOTOP(Client):
             api_hash=config.API_HASH,
             bot_token=config.BOT_TOKEN,
             in_memory=True,
-            parse_mode=ParseMode.HTML,
             max_concurrent_transmissions=7,
         )
 
@@ -44,7 +27,7 @@ class AMBOTOP(Client):
 
         try:
             await self.send_message(
-                chat_id=config.LOG_GROUP_ID,
+                chat_id=config.LOGGER_ID,
                 text=f"<u><b>» {self.mention} ʙᴏᴛ sᴛᴀʀᴛᴇᴅ :</b><u>\n\nɪᴅ : <code>{self.id}</code>\nɴᴀᴍᴇ : {self.name}\nᴜsᴇʀɴᴀᴍᴇ : @{self.username}",
             )
         except (errors.ChannelInvalid, errors.PeerIdInvalid):
@@ -58,7 +41,7 @@ class AMBOTOP(Client):
             )
             exit()
 
-        a = await self.get_chat_member(config.LOG_GROUP_ID, self.id)
+        a = await self.get_chat_member(config.LOGGER_ID, self.id)
         if a.status != ChatMemberStatus.ADMINISTRATOR:
             LOGGER(__name__).error(
                 "Please promote your bot as an admin in your log group/channel."
@@ -68,4 +51,3 @@ class AMBOTOP(Client):
 
     async def stop(self):
         await super().stop()
-
