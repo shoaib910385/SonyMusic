@@ -7,7 +7,7 @@ ffmpeg-python
 gitpython
 hachoir
 heroku3
-motor==2.5.0
+motor==3.1.1
 numpy
 opencv-python
 pillow
@@ -29,3 +29,4 @@ youtube-search-python
 httpx[http2]==0.27.2
 bs4
 SafoneAPI
+
