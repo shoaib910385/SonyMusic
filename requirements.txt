@@ -14,6 +14,7 @@ pillow
 psutil
 py-tgcalls==0.9.7
 pykeyboard
+git+https://github.com/AsmSafone/SafoneAPI
 pyrofork
 python-dotenv
 pyyaml
@@ -28,3 +29,4 @@ youtube-search
 youtube-search-python
 httpx[http2]==0.27.2
 bs4
+
