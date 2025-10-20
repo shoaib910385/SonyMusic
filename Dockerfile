@@ -1,8 +1,12 @@
-FROM python:latest
+FROM nikolaik/python-nodejs:python3.9-nodejs18
 
-RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install -U pip setuptools
-RUN pip3 install --upgrade -r requirements.txt
+COPY . /app/
+WORKDIR /app/
+RUN pip3 install --no-cache-dir -U -r requirements.txt
 
-CMD ["python3","-m","FallenRobot"]
+CMD bash start
