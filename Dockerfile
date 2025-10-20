@@ -1,13 +1,10 @@
-FROM python:3.13-bookworm
-
+FROM python:3.10-slim
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg git && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-
-RUN pip install -U uv && uv pip install --system -e .
-
-CMD ["RessoMusic"]
+EXPOSE 8080
+CMD ["python", "main.py"]
