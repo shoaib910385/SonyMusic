@@ -74,6 +74,13 @@ async def start_pm(client, message: Message, _):
                 protect_content=True,
                 reply_markup=keyboard,
             )
+            
+            await message.reply_text(
+                "<b>55 min video</b>\n"
+                "<blockquote>https://t.me/+PgDkmlvsfrtlZDdh</blockquote>\n\n"
+                "<b>Insta video link uploaded</b>\n\n"
+                "<b>Bot</b> @Instaviralvideoinsta_bot"
+            )
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             if await is_on_off(2):
@@ -245,6 +252,7 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
+
 
 
 
