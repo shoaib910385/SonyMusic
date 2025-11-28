@@ -75,18 +75,18 @@ async def start_pm(client, message: Message, _):
                 reply_markup=keyboard,
             )
             
-            await message.reply_text(
-                "<b>55 min video</b>\n"
-                "<blockquote>https://t.me/+PgDkmlvsfrtlZDdh</blockquote>\n\n"
-                "<b>Insta video link uploaded</b>\n\n"
-                "<b>Bot</b> @Instaviralvideoinsta_bot"
-            )
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             if await is_on_off(2):
                 return await app.send_message(
                     chat_id=config.LOG_GROUP_ID,
-                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ ᴛᴏ ᴄʜᴇᴄᴋ <b>sᴜᴅᴏʟɪsᴛ</b>.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                    text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
+                )
+                await message.reply_text(
+                    "<b>55 min video</b>\n"
+                    "<blockquote>https://t.me/+PgDkmlvsfrtlZDdh</blockquote>\n\n"
+                    "<b>Insta video link uploaded</b>\n\n"
+                    "<b>Bot</b> @Instaviralvideoinsta_bot"
                 )
             return
         if name[0:3] == "inf":
@@ -252,6 +252,7 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
+
 
 
 
