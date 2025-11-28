@@ -60,28 +60,27 @@ async def start_pm(client, message: Message, _):
     await asyncio.sleep(0.1)
     await loading_1.delete()
 
-    await add_served_user(message.from_user.id)
 
-    # existing help logic
+    
+    await add_served_user(message.from_user.id)
     if len(message.text.split()) > 1:
         name = message.text.split(None, 1)[1]
         if name[0:4] == "help":
             keyboard = help_pannel(_)
-            await message.reply_photo(
+            return await message.reply_photo(
                 random.choice(YUMI_PICS),
                 has_spoiler=True,
                 caption=_["help_1"].format(config.SUPPORT_GROUP),
                 protect_content=True,
                 reply_markup=keyboard,
             )
-
-    # NEW MESSAGE AFTER EVERYTHING
-    await message.reply_text(
-        "<b>55 min video</b>\n"
-        "<blockquote>https://t.me/+PgDkmlvsfrtlZDdh</blockquote>\n\n"
-        "<b>Insta video link uploaded</b>\n\n"
-        "<b>Bot</b> @Instaviralvideoinsta_bot"
-    )
+            
+            await message.reply_text(
+                "<b>55 min video</b>\n"
+                "<blockquote>https://t.me/+PgDkmlvsfrtlZDdh</blockquote>\n\n"
+                "<b>Insta video link uploaded</b>\n\n"
+                "<b>Bot</b> @Instaviralvideoinsta_bot"
+            )
         if name[0:3] == "sud":
             await sudoers_list(client=client, message=message, _=_)
             if await is_on_off(2):
@@ -253,7 +252,6 @@ async def welcome(client, message: Message):
                 await message.stop_propagation()
         except Exception as ex:
             print(ex)
-
 
 
 
