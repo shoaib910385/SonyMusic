@@ -391,6 +391,7 @@ async def play_commnd(
             await mystic.delete()
             await message.reply_photo(
                 photo=img,
+                has_spoiler=True,
                 caption=cap,
                 reply_markup=InlineKeyboardMarkup(buttons),
             )
@@ -409,6 +410,7 @@ async def play_commnd(
                 await mystic.delete()
                 await message.reply_photo(
                     photo=details["thumb"],
+                    has_spoiler=True,
                     caption=_["play_10"].format(
                         details["title"].title(),
                         details["duration_min"],
@@ -665,5 +667,6 @@ async def slider_queries(client, CallbackQuery, _):
         return await CallbackQuery.edit_message_media(
             media=med, reply_markup=InlineKeyboardMarkup(buttons)
         )
+
 
 
