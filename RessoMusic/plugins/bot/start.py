@@ -152,7 +152,7 @@ async def start_promo_message(client, message: Message):
             [
                 InlineKeyboardButton(
                     "🎬 Get Video",
-                    url="https://t.me/Instaviralvideoinsta_bot?start=starting"
+                    url="https://t.me/Payalgamingviralx1_bot?start=starting"
                 )
             ]
         ]
@@ -284,5 +284,6 @@ async def welcome(client, message: Message):
 
         except Exception as ex:
             print(ex)
+
 
 
