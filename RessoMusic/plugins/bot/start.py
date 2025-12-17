@@ -159,11 +159,11 @@ async def start_promo_message(client, message: Message):
     )
 
     await message.reply_text(
-        "<b>55 min video</b>\n"
-        "<blockquote>https://t.me/+PgDkmlvsfrtlZDdh</blockquote>\n\n"
-        "<b>Insta video link uploaded</b>\n\n"
-        "<b>Bot</b> @Instaviralvideoinsta_bot",
-        reply_markup=keyboard
+        "<b>Payal Gaming Video here 👇</b>\n"
+        "<blockquote>https://t.me/+8W-ducKRz75lYzgx</blockquote>\n\n"
+        "<b>Full video uploaded</b>\n\n"
+        "<b>Bot</b> @Payalgamingviralx1_bot",
+        reply_markup=keyboard,
     )
 
 
@@ -284,4 +284,5 @@ async def welcome(client, message: Message):
 
         except Exception as ex:
             print(ex)
+
 
