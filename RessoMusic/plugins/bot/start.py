@@ -141,30 +141,6 @@ async def start_pm(client, message: Message, _):
                 text=f"{message.from_user.mention} ᴊᴜsᴛ sᴛᴀʀᴛᴇᴅ ᴛʜᴇ ʙᴏᴛ.\n\n<b>ᴜsᴇʀ ɪᴅ :</b> <code>{message.from_user.id}</code>\n<b>ᴜsᴇʀɴᴀᴍᴇ :</b> @{message.from_user.username}",
             )
 
-# ========================= EXTRA PROMO MESSAGE =========================
-@app.on_message(filters.command(["start"]) & filters.private & ~BANNED_USERS, group=5)
-async def start_promo_message(client, message: Message):
-
-    await asyncio.sleep(1)
-
-    keyboard = InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "🎬 Get Video",
-                    url="https://t.me/Payalgamingspicybot?start=starting"
-                )
-            ]
-        ]
-    )
-
-    await message.reply_text(
-        "<b>Payal Gaming Video here 👇</b>\n"
-        "<blockquote>https://t.me/+SC8VXg0f-3hhNGEx</blockquote>\n\n"
-        "<b>Full video uploaded</b>\n\n"
-        "<b>Bot</b> @Payalgamingspicybot",
-        reply_markup=keyboard,
-    )
 
 
 # ========================= GROUP START =========================
@@ -284,6 +260,7 @@ async def welcome(client, message: Message):
 
         except Exception as ex:
             print(ex)
+
 
 
 
