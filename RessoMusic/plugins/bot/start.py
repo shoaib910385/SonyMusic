@@ -9,6 +9,7 @@ from youtubesearchpython.__future__ import VideosSearch
 
 import config
 from RessoMusic import app
+from RessoMusic.core.mongo import db # Importing Database Client
 from RessoMusic.misc import _boot_
 from RessoMusic.plugins.sudo.sudoers import sudoers_list
 from RessoMusic.utils.database import (
@@ -27,6 +28,10 @@ from config import BANNED_USERS
 from strings import get_string
 from RessoMusic.misc import SUDOERS
 
+# ========================= CONFIGURATION =========================
+# The User ID allowed to use /setstart and /editgrpstart
+CUSTOM_START_ADMIN = 7659846392 
+
 YUMI_PICS = [
     "https://files.catbox.moe/x832ly.jpg",
     "https://files.catbox.moe/y2to84.jpg",
@@ -34,6 +39,72 @@ YUMI_PICS = [
 ]
 
 GREET = ["💞", "🥂", "🔍", "🧪", "🥂", "⚡️", "🔥"]
+
+# ========================= DATABASE FUNCTIONS =========================
+startdb = db.start_messages
+
+async def get_private_start_text():
+    data = await startdb.find_one({"type": "private_start"})
+    if not data:
+        return None
+    return data["text"]
+
+async def set_private_start_text(text):
+    await startdb.update_one(
+        {"type": "private_start"}, 
+        {"$set": {"text": text}}, 
+        upsert=True
+    )
+
+async def get_group_start_text():
+    data = await startdb.find_one({"type": "group_start"})
+    if not data:
+        return None
+    return data["text"]
+
+async def set_group_start_text(text):
+    await startdb.update_one(
+        {"type": "group_start"}, 
+        {"$set": {"text": text}}, 
+        upsert=True
+    )
+
+# ========================= ADMIN COMMANDS =========================
+
+@app.on_message(filters.command(["setstart"]) & filters.user(CUSTOM_START_ADMIN))
+async def set_start_message_handler(client, message: Message):
+    if len(message.command) < 2:
+        return await message.reply_text(
+            "<b>Please provide the text to set.</b>\n\n"
+            "<b>Variables you can use:</b>\n"
+            "{0} - User Mention\n"
+            "{1} - Bot Mention\n"
+            "{2} - Uptime\n"
+            "{3} - Disk\n"
+            "{4} - CPU\n"
+            "{5} - RAM\n\n"
+            "<b>Example:</b> <code>/setstart Hello {0}, I am {1}. My Uptime is {2}</code>"
+        )
+    
+    text = message.text.split(None, 1)[1]
+    await set_private_start_text(text)
+    await message.reply_text("<b>✅ Private Start Message updated successfully.</b>")
+
+
+@app.on_message(filters.command(["editgrpstart"]) & filters.user(CUSTOM_START_ADMIN))
+async def set_group_start_message_handler(client, message: Message):
+    if len(message.command) < 2:
+        return await message.reply_text(
+            "<b>Please provide the text to set for groups.</b>\n\n"
+            "<b>Variables you can use:</b>\n"
+            "{0} - Bot Mention\n"
+            "{1} - Uptime\n\n"
+            "<b>Example:</b> <code>/editgrpstart Alive in {0}. Uptime: {1}</code>"
+        )
+    
+    text = message.text.split(None, 1)[1]
+    await set_group_start_text(text)
+    await message.reply_text("<b>✅ Group Start Message updated successfully.</b>")
 
 
 # ========================= PRIVATE START =========================
@@ -128,10 +199,36 @@ async def start_pm(client, message: Message, _):
     else:
         out = private_panel(_)
         UP, CPU, RAM, DISK = await bot_sys_stats()
+        
+        # Check for custom start text in DB
+        custom_text = await get_private_start_text()
+        
+        if custom_text:
+            try:
+                # Attempt to format with the 6 variables
+                final_caption = custom_text.format(
+                    message.from_user.mention, # {0}
+                    app.mention,               # {1}
+                    UP,                        # {2}
+                    DISK,                      # {3}
+                    CPU,                       # {4}
+                    RAM                        # {5}
+                )
+            except Exception:
+                # Fallback if custom text format is invalid
+                final_caption = _["start_2"].format(
+                    message.from_user.mention, app.mention, UP, DISK, CPU, RAM
+                )
+        else:
+            # Default behavior
+            final_caption = _["start_2"].format(
+                message.from_user.mention, app.mention, UP, DISK, CPU, RAM
+            )
+
         await message.reply_photo(
             random.choice(YUMI_PICS),
             has_spoiler=True,
-            caption=_["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM),
+            caption=final_caption,
             reply_markup=InlineKeyboardMarkup(out),
         )
 
@@ -142,17 +239,31 @@ async def start_pm(client, message: Message, _):
             )
 
 
-
 # ========================= GROUP START =========================
 @app.on_message(filters.command(["start"]) & filters.group & ~BANNED_USERS)
 @LanguageStart
 async def start_gp(client, message: Message, _):
     out = start_panel(_)
     uptime = int(time.time() - _boot_)
+    
+    # Check for custom group text in DB
+    custom_text = await get_group_start_text()
+    
+    if custom_text:
+        try:
+            final_caption = custom_text.format(
+                app.mention,               # {0}
+                get_readable_time(uptime)  # {1}
+            )
+        except Exception:
+             final_caption = _["start_1"].format(app.mention, get_readable_time(uptime))
+    else:
+        final_caption = _["start_1"].format(app.mention, get_readable_time(uptime))
+
     await message.reply_photo(
         random.choice(YUMI_PICS),
         has_spoiler=True,
-        caption=_["start_1"].format(app.mention, get_readable_time(uptime)),
+        caption=final_caption,
         reply_markup=InlineKeyboardMarkup(out),
     )
     return await add_served_chat(message.chat.id)
@@ -260,10 +371,3 @@ async def welcome(client, message: Message):
 
         except Exception as ex:
             print(ex)
-
-
-
-
-
-
-
