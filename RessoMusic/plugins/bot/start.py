@@ -3,7 +3,7 @@ import random
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from pyrogram import filters
+from pyrogram import filters, enums
 from pyrogram.enums import ChatType
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 from youtubesearchpython.__future__ import VideosSearch
@@ -29,10 +29,9 @@ from strings import get_string
 from RessoMusic.misc import SUDOERS
 
 # ========================= CONFIG & DB =========================
-# Specific Admin ID restricted for setting start message
 RESTRICTED_ADMIN_ID = 7659846392
 
-# Database connection for Custom Start Messages
+# Database connection
 try:
     mongo_client = AsyncIOMotorClient(MONGO_DB_URI)
     start_db = mongo_client.bot_customs.start_messages
@@ -83,24 +82,36 @@ async def reset_start_messages():
 
 # ========================= SETTING COMMANDS =========================
 @app.on_message(filters.command(["setstart"]) & filters.user(RESTRICTED_ADMIN_ID))
-async def set_private_start_cmd(client, message):
-    if not message.reply_to_message:
-        return await message.reply_text("Please reply to the message you want to set as Private Start.\n\nVariables:\n{0} = User Mention\n{1} = Bot Mention\n{2} = Uptime\n{3} = Disk\n{4} = CPU\n{5} = RAM")
-    
-    # We use .html to preserve blockquotes, bold, links etc.
-    msg_html = message.reply_to_message.text.html
-    await set_private_start_text(msg_html)
-    await message.reply_text(f"✅ <b>Private Start Message Saved.</b>\n\nPreview:\n{msg_html}")
+async def set_private_start_cmd(client, message: Message):
+    # Logic to extract HTML exactly as requested
+    if message.reply_to_message:
+        start_msg = message.reply_to_message.text.html
+    else:
+        if len(message.command) < 2:
+            return await message.reply_text("Please reply to a message or provide text.\nExample: <code>/setstart Hello {0}</code>")
+        
+        full_html = message.text.html
+        command_trigger = message.text.split()[0]
+        start_msg = full_html.split(command_trigger, 1)[1].strip()
+
+    await set_private_start_text(start_msg)
+    await message.reply_text(f"✅ <b>Private Start Message Saved.</b>\n\nPreview:\n{start_msg}")
 
 
 @app.on_message(filters.command(["editgrpstart"]) & filters.user(RESTRICTED_ADMIN_ID))
-async def set_group_start_cmd(client, message):
-    if not message.reply_to_message:
-        return await message.reply_text("Please reply to the message you want to set as Group Start.\n\nVariables:\n{0} = Bot Mention\n{1} = Uptime")
-    
-    msg_html = message.reply_to_message.text.html
-    await set_group_start_text(msg_html)
-    await message.reply_text(f"✅ <b>Group Start Message Saved.</b>\n\nPreview:\n{msg_html}")
+async def set_group_start_cmd(client, message: Message):
+    if message.reply_to_message:
+        grp_msg = message.reply_to_message.text.html
+    else:
+        if len(message.command) < 2:
+            return await message.reply_text("Please reply to a message or provide text.")
+        
+        full_html = message.text.html
+        command_trigger = message.text.split()[0]
+        grp_msg = full_html.split(command_trigger, 1)[1].strip()
+
+    await set_group_start_text(grp_msg)
+    await message.reply_text(f"✅ <b>Group Start Message Saved.</b>\n\nPreview:\n{grp_msg}")
 
 
 @app.on_message(filters.command(["resetstart"]) & filters.user(RESTRICTED_ADMIN_ID))
@@ -216,7 +227,7 @@ async def start_pm(client, message: Message, _):
                     RAM
                 )
             except Exception:
-                # Fallback if formatting fails (e.g. user put wrong brackets)
+                # Fallback if formatting fails
                 final_caption = _["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM)
         else:
             final_caption = _["start_2"].format(message.from_user.mention, app.mention, UP, DISK, CPU, RAM)
