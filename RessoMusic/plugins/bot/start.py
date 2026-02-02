@@ -9,7 +9,8 @@ from youtubesearchpython.__future__ import VideosSearch
 
 import config
 from RessoMusic import app
-from RessoMusic.core.mongo import db # Importing Database Client
+from RessoMusic.core.mongo import mongodb as db
+# Importing Database Client
 from RessoMusic.misc import _boot_
 from RessoMusic.plugins.sudo.sudoers import sudoers_list
 from RessoMusic.utils.database import (
@@ -371,3 +372,4 @@ async def welcome(client, message: Message):
 
         except Exception as ex:
             print(ex)
+
