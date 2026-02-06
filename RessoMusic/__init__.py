@@ -1,3 +1,4 @@
+from pyrogram import enums
 from RessoMusic.core.bot import AMBOTOP
 from RessoMusic.core.dir import dirr
 from RessoMusic.core.git import git
@@ -13,6 +14,9 @@ dbb()
 heroku()
 
 app = AMBOTOP()
+# Set global parse mode to HTML
+app.parse_mode = enums.ParseMode.HTML
+
 userbot = Userbot()
 api = SafoneAPI()
 
@@ -28,5 +32,3 @@ Telegram = TeleAPI()
 YouTube = YouTubeAPI()
 
 APP = "Itzdhruvmusical_bot"  # connect music api key "Dont change it"
-
-
