@@ -14,12 +14,11 @@ dbb()
 heroku()
 
 app = AMBOTOP()
-# Set global parse mode to HTML
-app.parse_mode = enums.ParseMode.HTML
+# Use the official method to set global parse mode
+app.set_parse_mode(enums.ParseMode.HTML)
 
 userbot = Userbot()
 api = SafoneAPI()
-
 
 from .platforms import *
 
@@ -31,4 +30,4 @@ Resso = RessoAPI()
 Telegram = TeleAPI()
 YouTube = YouTubeAPI()
 
-APP = "Itzdhruvmusical_bot"  # connect music api key "Dont change it"
+APP = "Itzdhruvmusical_bot" 
