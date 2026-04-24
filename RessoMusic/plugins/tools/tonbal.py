@@ -3,7 +3,6 @@ import io
 import os
 import asyncio
 import traceback
-from pyrogram.enums import ButtonStyle
 from pyrogram import filters
 from pyrogram.enums import ParseMode
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
@@ -16,7 +15,7 @@ TEMPLATE_PATH = os.path.join(current_dir, "balance_base.png")
 FONT_PATH = os.path.join(current_dir, "Poppins-Bold.ttf")
 
 MARKETPLACE_BUTTON = InlineKeyboardMarkup(
-    [[InlineKeyboardButton("◍ Join Channel ◍", url="https://t.me/itzdhruv1060", icon_custom_emoji_id=5409194306365829029, style=ButtonStyle.PRIMARY)]]
+    [[InlineKeyboardButton("◍ Join Channel ◍", url="https://t.me/itzdhruv1060", icon_custom_emoji_id=5409194306365829029)]]
 )
 
 async def delete_after_delay(messages: list, delay: int = 300):
