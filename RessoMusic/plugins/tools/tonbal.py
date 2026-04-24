@@ -15,7 +15,7 @@ TEMPLATE_PATH = os.path.join(current_dir, "balance_base.png")
 FONT_PATH = os.path.join(current_dir, "Poppins-Bold.ttf")
 
 MARKETPLACE_BUTTON = InlineKeyboardMarkup(
-    [[InlineKeyboardButton("◍ Join Channel ◍", url="https://t.me/itzdhruv1060", icon_custom_emoji_id=5409194306365829029)]]
+    [[InlineKeyboardButton("◍ Join Channel ◍", url="https://t.me/itzdhruv1060")]]
 )
 
 async def delete_after_delay(messages: list, delay: int = 300):
