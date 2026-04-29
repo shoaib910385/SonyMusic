@@ -26,7 +26,7 @@ from pyrogram.errors import (
 from RessoMusic.utils.database import get_assistant
 from RessoMusic.utils.decorators.language import languageCB
 from RessoMusic.utils.formatters import seconds_to_min
-from RessoMusic.utils.inline import close_markup, stream_markup, stream_markup_timer
+from RessoMusic.utils.inline import close_markup
 from RessoMusic.utils.stream.autoclear import auto_clean
 from RessoMusic.utils.thumbnails import get_thumb
 from config import (
