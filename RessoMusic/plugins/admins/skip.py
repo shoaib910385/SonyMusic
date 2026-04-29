@@ -1,16 +1,36 @@
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardMarkup, Message
+from pyrogram.types import InlineKeyboardMarkup, Message, LinkPreviewOptions
 
 import config
 from RessoMusic import YouTube, app
 from RessoMusic.core.call import AMBOTOP
 from RessoMusic.misc import db
+from RessoMusic.core.mongo import mongodb
 from RessoMusic.utils.database import get_loop
 from RessoMusic.utils.decorators import AdminRightsCheck
 from RessoMusic.utils.inline import close_markup, stream_markup
 from RessoMusic.utils.stream.autoclear import auto_clean
-from RessoMusic.utils.thumbnails import gen_thumb
 from config import BANNED_USERS
+
+# --- CUSTOM CAPTION LOGIC ---
+captiondb = mongodb.stream_captions
+
+async def get_stored_caption():
+    """Fetches the custom caption from MongoDB."""
+    data = await captiondb.find_one({"chat_id": "GLOBAL_CAPTION"})
+    if data and "text" in data:
+        return data["text"]
+    return None
+
+async def get_caption(_, link, title, duration, user):
+    """Generates the final caption string, formatted with arguments."""
+    custom_html = await get_stored_caption()
+    if custom_html:
+        try:
+            return custom_html.format(link, title, duration, user)
+        except Exception:
+            pass 
+    return _["stream_1"].format(link, title, duration, user)
 
 
 @app.on_message(
@@ -102,6 +122,7 @@ async def skip(cli, message: Message, _, chat_id):
         db[chat_id][0]["seconds"] = check[0]["old_second"]
         db[chat_id][0]["speed_path"] = None
         db[chat_id][0]["speed"] = 1.0
+        
     if "live_" in queued:
         n, link = await YouTube.video(videoid, True)
         if n == 0:
@@ -114,20 +135,19 @@ async def skip(cli, message: Message, _, chat_id):
             await AMBOTOP.skip_stream(chat_id, link, video=status, image=image)
         except:
             return await message.reply_text(_["call_6"])
+            
         button = stream_markup(_, chat_id)
-        img = await gen_thumb(videoid)
-        run = await message.reply_photo(
-            photo=img,
-            caption=_["stream_1"].format(
-                f"https://t.me/{app.username}?start=info_{videoid}",
-                title[:23],
-                check[0]["dur"],
-                user,
-            ),
+        vid_link = f"https://t.me/{app.username}?start=info_{videoid}"
+        cap = await get_caption(_, vid_link, title[:23], check[0]["dur"], user)
+        
+        run = await message.reply_text(
+            text=cap,
+            link_preview_options=LinkPreviewOptions(is_disabled=False, show_above_text=True),
             reply_markup=InlineKeyboardMarkup(button),
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
+        
     elif "vid_" in queued:
         mystic = await message.reply_text(_["call_7"], disable_web_page_preview=True)
         try:
@@ -147,34 +167,35 @@ async def skip(cli, message: Message, _, chat_id):
             await AMBOTOP.skip_stream(chat_id, file_path, video=status, image=image)
         except:
             return await mystic.edit_text(_["call_6"])
+            
         button = stream_markup(_, chat_id)
-        img = await gen_thumb(videoid)
-        run = await message.reply_photo(
-            photo=img,
-            caption=_["stream_1"].format(
-                f"https://t.me/{app.username}?start=info_{videoid}",
-                title[:23],
-                check[0]["dur"],
-                user,
-            ),
+        vid_link = f"https://t.me/{app.username}?start=info_{videoid}"
+        cap = await get_caption(_, vid_link, title[:23], check[0]["dur"], user)
+        
+        run = await message.reply_text(
+            text=cap,
+            link_preview_options=LinkPreviewOptions(is_disabled=False, show_above_text=True),
             reply_markup=InlineKeyboardMarkup(button),
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "stream"
         await mystic.delete()
+        
     elif "index_" in queued:
         try:
             await AMBOTOP.skip_stream(chat_id, videoid, video=status)
         except:
             return await message.reply_text(_["call_6"])
+            
         button = stream_markup(_, chat_id)
-        run = await message.reply_photo(
-            photo=config.STREAM_IMG_URL,
-            caption=_["stream_2"].format(user),
+        run = await message.reply_text(
+            text=_["stream_2"].format(user),
+            link_preview_options=LinkPreviewOptions(is_disabled=False, show_above_text=True),
             reply_markup=InlineKeyboardMarkup(button),
         )
         db[chat_id][0]["mystic"] = run
         db[chat_id][0]["markup"] = "tg"
+        
     else:
         if videoid == "telegram":
             image = None
@@ -189,43 +210,39 @@ async def skip(cli, message: Message, _, chat_id):
             await AMBOTOP.skip_stream(chat_id, queued, video=status, image=image)
         except:
             return await message.reply_text(_["call_6"])
+            
         if videoid == "telegram":
             button = stream_markup(_, chat_id)
-            run = await message.reply_photo(
-                photo=config.TELEGRAM_AUDIO_URL
-                if str(streamtype) == "audio"
-                else config.TELEGRAM_VIDEO_URL,
-                caption=_["stream_1"].format(
-                    config.SUPPORT_GROUP, title[:23], check[0]["dur"], user
-                ),
+            cap = await get_caption(_, config.SUPPORT_CHAT, title[:23], check[0]["dur"], user)
+            
+            run = await message.reply_text(
+                text=cap,
+                link_preview_options=LinkPreviewOptions(is_disabled=False, show_above_text=True),
                 reply_markup=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
+            
         elif videoid == "soundcloud":
             button = stream_markup(_, chat_id)
-            run = await message.reply_photo(
-                photo=config.SOUNCLOUD_IMG_URL
-                if str(streamtype) == "audio"
-                else config.TELEGRAM_VIDEO_URL,
-                caption=_["stream_1"].format(
-                    config.SUPPORT_GROUP, title[:23], check[0]["dur"], user
-                ),
+            cap = await get_caption(_, config.SUPPORT_CHAT, title[:23], check[0]["dur"], user)
+            
+            run = await message.reply_text(
+                text=cap,
+                link_preview_options=LinkPreviewOptions(is_disabled=False, show_above_text=True),
                 reply_markup=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
             db[chat_id][0]["markup"] = "tg"
+            
         else:
             button = stream_markup(_, chat_id)
-            img = await gen_thumb(videoid)
-            run = await message.reply_photo(
-                photo=img,
-                caption=_["stream_1"].format(
-                    f"https://t.me/{app.username}?start=info_{videoid}",
-                    title[:23],
-                    check[0]["dur"],
-                    user,
-                ),
+            vid_link = f"https://t.me/{app.username}?start=info_{videoid}"
+            cap = await get_caption(_, vid_link, title[:23], check[0]["dur"], user)
+            
+            run = await message.reply_text(
+                text=cap,
+                link_preview_options=LinkPreviewOptions(is_disabled=False, show_above_text=True),
                 reply_markup=InlineKeyboardMarkup(button),
             )
             db[chat_id][0]["mystic"] = run
