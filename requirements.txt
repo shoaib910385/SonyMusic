@@ -10,12 +10,13 @@ heroku3
 motor==2.5.0
 numpy
 opencv-python
+kurigram
 pillow
 psutil
 py-tgcalls==0.9.7
 pykeyboard
 git+https://github.com/AsmSafone/SafoneAPI
-pyrofork
+pyrotgfork >= 2.2.20
 python-dotenv
 pyyaml
 requests
