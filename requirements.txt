@@ -12,6 +12,8 @@ numpy
 opencv-python
 kurigram
 pillow
+pyttsx3
+pytz
 psutil
 py-tgcalls==0.9.7
 pykeyboard
@@ -27,6 +29,7 @@ unidecode
 uvloop
 yt-dlp
 py-yt-search
+youtube-search-python
 youtube-search
 httpx[http2]==0.27.2
 bs4
